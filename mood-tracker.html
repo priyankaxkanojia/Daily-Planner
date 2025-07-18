@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Drag & Drop Mood Tracker</title>
+  <style>
+    body {
+      background-color: #fff5f9;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+      margin: 0;
+      color: #4a2e38;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    header a {
+      text-decoration: none;
+      font-size: 1rem;
+      color: #8a4f61;
+    }
+
+    h1 {
+      text-align: center;
+      color: #c76c85;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    select {
+      font-size: 1rem;
+      padding: 5px 10px;
+      border: 1px solid #c76c85;
+      border-radius: 5px;
+    }
+
+    .tracker {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      justify-items: center;
+      margin-bottom: 40px;
+    }
+
+    .day {
+      width: 50px;
+      height: 50px;
+      border: 2px dashed #c76c85;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 50px;
+      font-size: 1.5rem;
+      position: relative;
+      background-color: white;
+    }
+
+    .day-number {
+      position: absolute;
+      top: -18px;
+      font-size: 0.8rem;
+      color: #4a2e38;
+      width: 100%;
+      text-align: center;
+    }
+
+    .mood-palette {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .mood {
+      font-size: 2rem;
+      cursor: grab;
+      text-align: center;
+    }
+
+    .mood[draggable="true"]:hover {
+      transform: scale(1.2);
+    }
+
+    .mood-label {
+      font-size: 0.9rem;
+      text-align: center;
+      color: #4a2e38;
+    }
+
+    .mood-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Dark Mode */
+    body.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .day {
+      border-color: #e0e0e0;
+      background-color: #1f1f1f;
+    }
+
+    body.dark-mode .mood-label {
+      color: #e0e0e0;
+    }
+
+    body.dark-mode select,
+    body.dark-mode header a {
+      background-color: #2c2c2c;
+      color: #f0f0f0;
+      border-color: #777;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html">&larr; Back</a>
+  </header>
+
+  <h1>Drag & Drop Mood Tracker</h1>
+
+  <!-- 🌗 Dark Mode Toggle -->
+  <div style="text-align:center; margin: 10px 0;">
+    <label style="cursor:pointer;">
+      <input type="checkbox" id="darkToggle" />
+      🌙 Enable Dark Mode
+    </label>
+  </div>
+
+  <div class="controls">
+    <select id="monthSelect">
+      <option value="0">Jan</option>
+      <option value="1">Feb</option>
+      <option value="2">Mar</option>
+      <option value="3">Apr</option>
+      <option value="4">May</option>
+      <option value="5">Jun</option>
+      <option value="6">Jul</option>
+      <option value="7">Aug</option>
+      <option value="8">Sep</option>
+      <option value="9">Oct</option>
+      <option value="10">Nov</option>
+      <option value="11">Dec</option>
+    </select>
+
+    <select id="yearSelect">
+      <script>
+        for (let y = 2025; y <= 2090; y++) {
+          document.write(`<option value="${y}">${y}</option>`);
+        }
+      </script>
+    </select>
+  </div>
+
+  <div class="tracker" id="tracker"></div>
+
+  <!-- 📊 Mood Stats Summary -->
+  <div id="moodStats" style="text-align:center; font-weight:bold; margin-top: 20px;"></div>
+
+  <h2 style="text-align:center;">Mood Palette</h2>
+  <div class="mood-palette">
+    <div class="mood-container"><div class="mood" draggable="true" data-color="red">❤️</div><div class="mood-label">Bad Mood</div></div>
+    <div class="mood-container"><div class="mood" draggable="true" data-color="blue">💙</div><div class="mood-label">Sad Mood</div></div>
+    <div class="mood-container"><div class="mood" draggable="true" data-color="green">💚</div><div class="mood-label">Lazy Mood</div></div>
+    <div class="mood-container"><div class="mood" draggable="true" data-color="yellow">💛</div><div class="mood-label">Good Mood</div></div>
+    <div class="mood-container"><div class="mood" draggable="true" data-color="purple">💜</div><div class="mood-label">Productive Mood</div></div>
+    <div class="mood-container"><div class="mood" draggable="true" data-color="black">🖤</div><div class="mood-label">Active Mood</div></div>
+    <div class="mood-container"><div class="mood" draggable="true" data-color="white">🤍</div><div class="mood-label">Lazy Mood</div></div>
+  </div>
+
+  <script>
+    const tracker = document.getElementById('tracker');
+    const yearSelect = document.getElementById('yearSelect');
+    const monthSelect = document.getElementById('monthSelect');
+
+    function createDays() {
+      tracker.innerHTML = "";
+      for (let i = 1; i <= 31; i++) {
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('day');
+        wrapper.setAttribute('data-day', i);
+        wrapper.setAttribute('ondrop', 'drop(event)');
+        wrapper.setAttribute('ondragover', 'allowDrop(event)');
+
+        const number = document.createElement('div');
+        number.className = 'day-number';
+        number.textContent = i;
+
+        wrapper.appendChild(number);
+        tracker.appendChild(wrapper);
+      }
+    }
+
+    createDays();
+
+    const moods = document.querySelectorAll('.mood');
+    moods.forEach(mood => {
+      mood.addEventListener('dragstart', function (e) {
+        e.dataTransfer.setData('text/plain', mood.outerHTML);
+      });
+    });
+
+    function allowDrop(ev) {
+      ev.preventDefault();
+    }
+
+    function getStorageKey() {
+      const year = yearSelect.value;
+      const month = monthSelect.value;
+      return `moodTracker_${year}_${month}`;
+    }
+
+    function saveMoods() {
+      const moodData = {};
+      document.querySelectorAll('.day').forEach(day => {
+        const mood = day.querySelector('.mood');
+        moodData[day.dataset.day] = mood ? mood.outerHTML : null;
+      });
+      localStorage.setItem(getStorageKey(), JSON.stringify(moodData));
+      updateMoodStats();
+    }
+
+    function loadMoods() {
+      createDays();
+      const saved = localStorage.getItem(getStorageKey());
+      if (!saved) return;
+      const moodData = JSON.parse(saved);
+      document.querySelectorAll('.day').forEach(day => {
+        const num = day.querySelector('.day-number');
+        day.innerHTML = '';
+        day.appendChild(num);
+        if (moodData[day.dataset.day]) {
+          day.innerHTML += moodData[day.dataset.day];
+        }
+      });
+      updateMoodStats();
+    }
+
+    function drop(ev) {
+      ev.preventDefault();
+      const data = ev.dataTransfer.getData('text/plain');
+      const target = ev.target.closest('.day');
+      if (!target) return;
+      const number = target.querySelector('.day-number');
+      target.innerHTML = '';
+      target.appendChild(number);
+      target.innerHTML += data;
+      saveMoods();
+    }
+
+    function updateMoodStats() {
+      const counts = {};
+      document.querySelectorAll('.day .mood').forEach(moodEl => {
+        const color = moodEl.getAttribute('data-color');
+        counts[color] = (counts[color] || 0) + 1;
+      });
+
+      const moodNames = {
+        red: 'Bad Mood ❤️',
+        blue: 'Sad Mood 💙',
+        green: 'Lazy Mood 💚',
+        yellow: 'Good Mood 💛',
+        purple: 'Productive Mood 💜',
+        black: 'Active Mood 🖤',
+        white: 'Lazy Mood 🤍'
+      };
+
+      let stats = "📊 <u><b>Your Monthly Mood Summary:</b></u><br>";
+      if (Object.keys(counts).length === 0) stats += "No moods selected yet.";
+      else {
+        for (const [color, count] of Object.entries(counts)) {
+          stats += `${moodNames[color] || color}: <b>${count}</b><br>`;
+        }
+      }
+      document.getElementById("moodStats").innerHTML = stats;
+    }
+
+    // 🗑️ Double-click to delete mood
+    tracker.addEventListener("dblclick", function (e) {
+      if (e.target.classList.contains("mood")) {
+        const moodEl = e.target;
+        const parent = moodEl.closest(".day");
+        const number = parent.querySelector(".day-number");
+        parent.innerHTML = '';
+        parent.appendChild(number);
+        saveMoods();
+      }
+    });
+
+    // 🌙 Dark Mode Toggle
+    document.getElementById("darkToggle").addEventListener("change", function () {
+      document.body.classList.toggle("dark-mode", this.checked);
+    });
+
+    yearSelect.addEventListener('change', loadMoods);
+    monthSelect.addEventListener('change', loadMoods);
+
+    window.onload = () => {
+      loadMoods();
+    };
+  </script>
+</body>
+</html>

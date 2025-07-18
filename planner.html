@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Goal Planner</title>
+  <style>
+    body {
+      background-image: url('Background.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-position: center;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+      margin: 0;
+      color: #4a2e38;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    header a {
+      text-decoration: none;
+      font-size: 1rem;
+      color: #8a4f61;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #c76c85;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 15px;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #e5b9c5;
+      border-radius: 8px;
+      margin-top: 5px;
+      font-size: 1rem;
+      background-color: #fff0f5;
+    }
+
+    button {
+      background-color: #f9d6e2;
+      color: #8a4f61;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      margin-top: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #f7c3d2;
+    }
+
+    .emoji-list span {
+      cursor: pointer;
+      font-size: 1.5rem;
+      margin-right: 5px;
+    }
+
+    .entry {
+      border: 1px solid #f5c6d0;
+      border-radius: 8px;
+      padding: 10px;
+      margin-top: 10px;
+      background-color: #fff0f5;
+    }
+
+    .entry p {
+      margin: 4px 0;
+    }
+
+    .entry button {
+      background-color: #ffd6dc;
+      font-size: 0.8rem;
+      padding: 5px 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <a href="index.html">← Back</a>
+  </header>
+
+  <h1>Daily Goal Planner</h1>
+
+  <label>Time:</label>
+  <input type="time" id="time">
+
+  <label>Type of Goal:</label>
+  <select id="goal-type">
+    <option value="">Select Type</option>
+    <option value="Study">📘 Study</option>
+    <option value="Work">💼 Work</option>
+    <option value="Health">💪 Health</option>
+    <option value="Personal">🌸 Personal</option>
+    <option value="Formula 1">🏎 Formula 1</option>
+    <option value="Tennis">🎾 Tennis</option>
+    <option value="Yoga/Meditation">🧘🏻‍♀️ Yoga/Meditation</option>
+    <option value="Other">✨ Other</option>
+  </select>
+
+  <label>Goal:</label>
+  <input type="text" id="goal" placeholder="e.g. Finish math revision">
+
+  <label>Thoughts / Feelings:</label>
+  <textarea id="thoughts" placeholder="Write your feelings or thoughts..."></textarea>
+
+  <label>Select Mood:</label>
+  <div class="emoji-list" id="emoji-list">
+    <span>😊</span><span>😳</span><span>😡</span><span>😌</span><span>🧘🏻‍♀️</span><span>😴</span><span>🌸</span><span>🏎</span><span>🎾</span><span>🥘</span><span>🥂</span>
+  </div>
+
+  <button onclick="saveEntry()">Save Entry</button>
+
+  <h2>Saved Entries</h2>
+  <div id="entries"></div>
+
+  <script>
+    let selectedEmoji = "";
+
+    document.querySelectorAll('#emoji-list span').forEach(emoji => {
+      emoji.addEventListener('click', () => {
+        selectedEmoji = emoji.textContent;
+      });
+    });
+
+    function saveEntry() {
+      const time = document.getElementById('time').value;
+      const type = document.getElementById('goal-type').value;
+      const goal = document.getElementById('goal').value;
+      const thoughts = document.getElementById('thoughts').value;
+
+      if (!time || !type || !goal) return alert("Please fill all required fields.");
+
+      const entry = {
+        time,
+        type,
+        goal,
+        thoughts,
+        mood: selectedEmoji
+      };
+
+      let allEntries = JSON.parse(localStorage.getItem('plannerEntries') || '[]');
+      allEntries.push(entry);
+      localStorage.setItem('plannerEntries', JSON.stringify(allEntries));
+      displayEntries();
+
+      document.getElementById('time').value = '';
+      document.getElementById('goal-type').value = '';
+      document.getElementById('goal').value = '';
+      document.getElementById('thoughts').value = '';
+      selectedEmoji = '';
+    }
+
+    function deleteEntry(index) {
+      let allEntries = JSON.parse(localStorage.getItem('plannerEntries') || '[]');
+      allEntries.splice(index, 1);
+      localStorage.setItem('plannerEntries', JSON.stringify(allEntries));
+      displayEntries();
+    }
+
+    function displayEntries() {
+      const container = document.getElementById('entries');
+      container.innerHTML = '';
+      const allEntries = JSON.parse(localStorage.getItem('plannerEntries') || '[]');
+
+      allEntries.forEach((entry, index) => {
+        const div = document.createElement('div');
+        div.className = 'entry';
+        div.innerHTML = `
+          <p><strong>${entry.time}</strong> [${entry.type}] - ${entry.goal} ${entry.mood}</p>
+          <p><em>${entry.thoughts}</em></p>
+          <button onclick="deleteEntry(${index})">Delete</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    window.onload = displayEntries;
+  </script>
+</body>
+
+</html>
