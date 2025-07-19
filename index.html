@@ -1,4 +1,4 @@
-<!-- dailyplanner.html -->
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -60,20 +60,98 @@
       font-size: 0.9rem;
       color: #b98e9b;
     }
+
+    /* 🎨 Background Panel Styles */
+    .floating-tab {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #f9d6e2;
+      color: #8a4f61;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 24px;
+      text-align: center;
+      line-height: 40px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      z-index: 10;
+    }
+
+    .bg-panel {
+      position: fixed;
+      bottom: 70px;
+      right: 20px;
+      background-color: #fff0f5;
+      padding: 10px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      display: none;
+      z-index: 10;
+    }
+
+    .bg-panel input,
+    .bg-panel button {
+      margin-top: 5px;
+      width: 100%;
+      box-sizing: border-box;
+    }
   </style>
 </head>
 
 <body>
-  <h1>Planner</h1>
+  <h1>Your Daily Planner</h1>
   <div class="nav-buttons">
     <a href="planner.html">📝 Daily Goal Planner</a>
     <a href="image-gallery.html">📸 Image Gallery</a>
     <a href="journal.html">📖 Journal</a>
     <a href="mood-tracker.html">🌈 Mood Tracker</a>
   </div>
+
   <footer>
     &copy; 2025 Priyanka's Diaries. All rights reserved.
   </footer>
+
+  <!-- 🎨 Floating Tab & Background Panel -->
+  <div class="floating-tab" onclick="toggleBgPanel()">🎨</div>
+
+  <div class="bg-panel" id="bgPanel">
+    <input type="file" id="bgInput" accept="image/*">
+    <button onclick="setBackground()">Set</button>
+    <button onclick="clearBackground()">Reset</button>
+  </div>
+
+  <script>
+    function toggleBgPanel() {
+      const panel = document.getElementById('bgPanel');
+      panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function setBackground() {
+      const bgInput = document.getElementById('bgInput');
+      if (!bgInput.files.length) return alert("Please select a background image.");
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        localStorage.setItem('backgroundImage', e.target.result);
+        document.body.style.backgroundImage = `url(${e.target.result})`;
+      };
+      reader.readAsDataURL(bgInput.files[0]);
+    }
+
+    function clearBackground() {
+      localStorage.removeItem('backgroundImage');
+      document.body.style.backgroundImage = '';
+    }
+
+    window.onload = function () {
+      const bg = localStorage.getItem('backgroundImage');
+      if (bg) {
+        document.body.style.backgroundImage = `url(${bg})`;
+      }
+    };
+  </script>
 </body>
 
 </html>
