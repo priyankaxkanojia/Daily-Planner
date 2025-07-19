@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Image Gallery</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fff0f5;
+      margin: 0;
+      padding: 20px;
+      color: #4a2e38;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+    h1 {
+      text-align: center;
+      color: #c76c85;
+      margin-bottom: 10px;
+    }
+    .back-tab {
+      display: inline-block;
+      margin-bottom: 20px;
+      text-decoration: none;
+      color: #fff;
+      background-color: #f9d6e2;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 1rem;
+      animation: bounce 2s infinite;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+    .back-tab:hover {
+      background-color: #f7c3d2;
+      transform: scale(1.05);
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    .upload-section {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    input[type="file"], select, button, #customCategoryInput {
+      margin: 10px;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #e5b9c5;
+      background-color: #fff;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 15px;
+    }
+    .category-box {
+      background-color: #fff;
+      border-radius: 12px;
+      padding: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      cursor: pointer;
+    }
+    .category-title {
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #c76c85;
+    }
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 5px;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+    }
+    .category-grid img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .image-popup, .category-popup {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    .popup-content {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 90vw;
+      max-height: 90vh;
+      overflow: auto;
+      text-align: center;
+    }
+    .popup-content img {
+      max-width: 100%;
+      border-radius: 12px;
+    }
+    .popup-content textarea {
+      width: 100%;
+      margin-top: 10px;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    .popup-content .info {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #555;
+    }
+    .popup-content button {
+      margin-top: 10px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 8px;
+      margin-right: 8px;
+      cursor: pointer;
+    }
+    .floating-tab {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #f9d6e2;
+      color: #8a4f61;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 24px;
+      text-align: center;
+      line-height: 40px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+    .bg-panel {
+      position: fixed;
+      bottom: 70px;
+      right: 20px;
+      background-color: #fff0f5;
+      padding: 10px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      display: none;
+      z-index: 10;
+    }
+    .category-popup img {
+      max-width: 120px;
+      max-height: 120px;
+      margin: 5px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <a class="back-tab" href="index.html">🔙 Back to Home</a>
+  <h1>📸 My Outfit Gallery</h1>
+
+  <div class="upload-section">
+    <input type="file" id="imageInput" accept="image/*">
+    <select id="category" onchange="handleCategoryChange(this)">
+      <option value="Casual">Casual</option>
+      <option value="Work">Work</option>
+      <option value="Party">Party</option>
+      <option value="Travel">Travel</option>
+      <option value="Other">Other</option>
+    </select>
+    <input type="text" id="customCategoryInput" placeholder="Enter custom category" style="display:none;" />
+    <button onclick="uploadImage()">Upload</button>
+  </div>
+
+  <div class="gallery" id="gallery"></div>
+
+  <div class="floating-tab" onclick="toggleBgPanel()">🎨</div>
+  <div class="bg-panel" id="bgPanel">
+    <input type="file" id="bgInput" accept="image/*">
+    <button onclick="setBackground()">Set</button>
+    <button onclick="clearBackground()">Reset</button>
+  </div>
+
+  <div id="popupContainer"></div>
+
+  <script>
+    function handleCategoryChange(select) {
+      document.getElementById('customCategoryInput').style.display = select.value === 'Other' ? 'inline-block' : 'none';
+    }
+
+    function uploadImage() {
+      const fileInput = document.getElementById('imageInput');
+      let category = document.getElementById('category').value;
+      if (category === 'Other') {
+        const custom = document.getElementById('customCategoryInput').value.trim();
+        if (!custom) return alert("Please enter a custom category name.");
+        category = custom;
+      }
+      if (!fileInput.files.length) return alert("Please select an image.");
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const allImages = JSON.parse(localStorage.getItem('imageGallery') || '[]');
+        allImages.push({ src: e.target.result, category, date: new Date().toLocaleString(), comment: '' });
+        localStorage.setItem('imageGallery', JSON.stringify(allImages));
+        displayImages();
+      };
+      reader.readAsDataURL(fileInput.files[0]);
+    }
+
+    function openPopup(imageData, index) {
+      const popup = document.createElement('div');
+      popup.className = 'image-popup';
+      popup.innerHTML = `
+        <div class="popup-content">
+          <img src="${imageData.src}" />
+          <div class="info">Uploaded on: ${imageData.date}</div>
+          <textarea id="commentBox">${imageData.comment || ''}</textarea>
+          <br>
+          <button onclick="saveComment(${index})">Save Comment</button>
+          <button onclick="deleteImage(${index})">Delete</button>
+          <button onclick="this.closest('.image-popup').remove()">Cancel</button>
+        </div>
+      `;
+      document.getElementById('popupContainer').appendChild(popup);
+    }
+
+    function openCategoryPopup(category, items) {
+      const popup = document.createElement('div');
+      popup.className = 'category-popup image-popup';
+      popup.innerHTML = `
+        <div class="popup-content">
+          <h3>${category}</h3>
+          <div>${items.map(item => `<img src="${item.src}" onclick="openPopupFromCategory(${item.index})"/>`).join('')}</div>
+          <button onclick="this.closest('.category-popup').remove()">Close</button>
+        </div>
+      `;
+      document.getElementById('popupContainer').appendChild(popup);
+    }
+
+    function openPopupFromCategory(index) {
+      document.getElementById('popupContainer').innerHTML = '';
+      const allImages = JSON.parse(localStorage.getItem('imageGallery') || '[]');
+      if (allImages[index]) openPopup(allImages[index], index);
+    }
+
+    function saveComment(index) {
+      const text = document.getElementById('commentBox').value;
+      const allImages = JSON.parse(localStorage.getItem('imageGallery') || '[]');
+      if (allImages[index]) {
+        allImages[index].comment = text;
+        localStorage.setItem('imageGallery', JSON.stringify(allImages));
+      }
+    }
+
+    function deleteImage(index) {
+      const allImages = JSON.parse(localStorage.getItem('imageGallery') || '[]');
+      allImages.splice(index, 1);
+      localStorage.setItem('imageGallery', JSON.stringify(allImages));
+      document.getElementById('popupContainer').innerHTML = '';
+      displayImages();
+    }
+
+    function displayImages() {
+      const gallery = document.getElementById('gallery');
+      gallery.innerHTML = '';
+      const allImages = JSON.parse(localStorage.getItem('imageGallery') || '[]');
+      const grouped = {};
+
+      allImages.forEach((img, index) => {
+        if (!grouped[img.category]) grouped[img.category] = [];
+        grouped[img.category].push({ ...img, index });
+      });
+
+      for (const cat in grouped) {
+        const box = document.createElement('div');
+        box.className = 'category-box';
+        const title = document.createElement('div');
+        title.className = 'category-title';
+        title.innerText = cat;
+        const grid = document.createElement('div');
+        grid.className = 'category-grid';
+
+        grouped[cat].slice(-4).forEach(item => {
+          const img = document.createElement('img');
+          img.src = item.src;
+          grid.appendChild(img);
+        });
+
+        box.appendChild(title);
+        box.appendChild(grid);
+        box.onclick = () => openCategoryPopup(cat, grouped[cat]);
+        gallery.appendChild(box);
+      }
+    }
+
+    function setBackground() {
+      const bgInput = document.getElementById('bgInput');
+      if (!bgInput.files.length) return alert("Please select a background image.");
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        localStorage.setItem('backgroundImage', e.target.result);
+        document.body.style.backgroundImage = `url(${e.target.result})`;
+      };
+      reader.readAsDataURL(bgInput.files[0]);
+    }
+
+    function clearBackground() {
+      localStorage.removeItem('backgroundImage');
+      document.body.style.backgroundImage = '';
+    }
+
+    function toggleBgPanel() {
+      const panel = document.getElementById('bgPanel');
+      panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    }
+
+    window.onload = function () {
+      displayImages();
+      const bg = localStorage.getItem('backgroundImage');
+      if (bg) document.body.style.backgroundImage = `url(${bg})`;
+    };
+  </script>
+</body>
+</html>
