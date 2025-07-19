@@ -11,6 +11,9 @@
       padding: 20px;
       margin: 0;
       color: #4a2e38;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
     }
 
     header {
@@ -123,6 +126,42 @@
       color: #f0f0f0;
       border-color: #777;
     }
+
+    /* Background Editor */
+    .floating-tab {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #f9d6e2;
+      color: #8a4f61;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 24px;
+      text-align: center;
+      line-height: 40px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    .bg-panel {
+      position: fixed;
+      bottom: 70px;
+      right: 20px;
+      background-color: #fff0f5;
+      padding: 10px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      display: none;
+      z-index: 10;
+    }
+
+    .bg-panel input,
+    .bg-panel button {
+      margin-top: 5px;
+      width: 100%;
+      box-sizing: border-box;
+    }
   </style>
 </head>
 <body>
@@ -167,7 +206,6 @@
 
   <div class="tracker" id="tracker"></div>
 
-  <!-- 📊 Mood Stats Summary -->
   <div id="moodStats" style="text-align:center; font-weight:bold; margin-top: 20px;"></div>
 
   <h2 style="text-align:center;">Mood Palette</h2>
@@ -179,6 +217,15 @@
     <div class="mood-container"><div class="mood" draggable="true" data-color="purple">💜</div><div class="mood-label">Productive Mood</div></div>
     <div class="mood-container"><div class="mood" draggable="true" data-color="black">🖤</div><div class="mood-label">Active Mood</div></div>
     <div class="mood-container"><div class="mood" draggable="true" data-color="white">🤍</div><div class="mood-label">Lazy Mood</div></div>
+  </div>
+
+  <!-- 🎨 Floating Tab for Background Editing -->
+  <div class="floating-tab" onclick="toggleBgPanel()">🎨</div>
+
+  <div class="bg-panel" id="bgPanel">
+    <input type="file" id="bgInput" accept="image/*">
+    <button onclick="setBackground()">Set</button>
+    <button onclick="clearBackground()">Reset</button>
   </div>
 
   <script>
@@ -308,8 +355,35 @@
     yearSelect.addEventListener('change', loadMoods);
     monthSelect.addEventListener('change', loadMoods);
 
+    // 🎨 Background Panel Logic
+    function toggleBgPanel() {
+      const panel = document.getElementById('bgPanel');
+      panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function setBackground() {
+      const bgInput = document.getElementById('bgInput');
+      if (!bgInput.files.length) return alert("Please select a background image.");
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        localStorage.setItem('backgroundImage', e.target.result);
+        document.body.style.backgroundImage = `url(${e.target.result})`;
+      };
+      reader.readAsDataURL(bgInput.files[0]);
+    }
+
+    function clearBackground() {
+      localStorage.removeItem('backgroundImage');
+      document.body.style.backgroundImage = '';
+    }
+
     window.onload = () => {
       loadMoods();
+      const bg = localStorage.getItem('backgroundImage');
+      if (bg) {
+        document.body.style.backgroundImage = `url(${bg})`;
+      }
     };
   </script>
 </body>
