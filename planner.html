@@ -103,6 +103,9 @@
 
   <h1>Daily Goal Planner</h1>
 
+  <label>Date (dd/mm/yyyy):</label>
+  <input type="date" id="date">
+
   <label>Time:</label>
   <input type="time" id="time">
 
@@ -145,14 +148,16 @@
     });
 
     function saveEntry() {
+      const date = document.getElementById('date').value;
       const time = document.getElementById('time').value;
       const type = document.getElementById('goal-type').value;
       const goal = document.getElementById('goal').value;
       const thoughts = document.getElementById('thoughts').value;
 
-      if (!time || !type || !goal) return alert("Please fill all required fields.");
+      if (!date || !time || !type || !goal) return alert("Please fill all required fields.");
 
       const entry = {
+        date,
         time,
         type,
         goal,
@@ -165,6 +170,7 @@
       localStorage.setItem('plannerEntries', JSON.stringify(allEntries));
       displayEntries();
 
+      document.getElementById('date').value = '';
       document.getElementById('time').value = '';
       document.getElementById('goal-type').value = '';
       document.getElementById('goal').value = '';
@@ -188,7 +194,7 @@
         const div = document.createElement('div');
         div.className = 'entry';
         div.innerHTML = `
-          <p><strong>${entry.time}</strong> [${entry.type}] - ${entry.goal} ${entry.mood}</p>
+          <p><strong>${entry.date}</strong> ${entry.time} [${entry.type}] - ${entry.goal} ${entry.mood}</p>
           <p><em>${entry.thoughts}</em></p>
           <button onclick="deleteEntry(${index})">Delete</button>
         `;
