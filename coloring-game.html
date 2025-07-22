@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coloring Game</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      background-color: #fff0f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #d36b99;
+      margin-bottom: 10px;
+    }
+
+    .toolbar {
+      margin-bottom: 10px;
+    }
+
+    .toolbar button,
+    .toolbar input[type="color"] {
+      margin: 5px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      background-color: #f9d6e2;
+      color: #8a4f61;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .toolbar button:hover {
+      background-color: #f7c3d2;
+    }
+
+    canvas {
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      background-color: white;
+    }
+
+    .back-button {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      background-color: #f9d6e2;
+      color: #8a4f61;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .back-button:hover {
+      background-color: #f7c3d2;
+    }
+  </style>
+</head>
+
+<body>
+  <a href="mini-games.html" class="back-button">← Back</a>
+  <h1>🎨 Coloring Game</h1>
+  <div class="toolbar">
+    <label for="colorPicker">Pick Color:</label>
+    <input type="color" id="colorPicker">
+    <button onclick="clearCanvas()">Reset</button>
+    <button onclick="undo()">Undo</button>
+    <button onclick="saveImage()">Save</button>
+    <button onclick="playSound('paint')">🎵 Sound</button>
+    <select id="imageSelector" onchange="loadImage()">
+      <option value="flower">🌸 Flower</option>
+      <option value="house">🏠 House</option>
+      <option value="sun">☀️ Sun & Cloud</option>
+    </select>
+  </div>
+
+  <canvas id="colorCanvas" width="400" height="400"></canvas>
+
+  <audio id="paintSound" src="https://www.soundjay.com/button/sounds/button-29.mp3"></audio>
+
+  <script>
+    const canvas = document.getElementById('colorCanvas');
+    const ctx = canvas.getContext('2d');
+    const colorPicker = document.getElementById('colorPicker');
+    const paintSound = document.getElementById('paintSound');
+    let isDrawing = false;
+    let history = [];
+    let animationFrame;
+
+    const drawStrokes = [];
+
+    function playSound(type) {
+      if (type === 'paint') {
+        paintSound.currentTime = 0;
+        paintSound.play();
+      }
+    }
+
+    function saveImage() {
+      const link = document.createElement('a');
+      link.download = 'coloring.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+
+    function undo() {
+      if (history.length > 0) {
+        history.pop();
+        restoreCanvas();
+      }
+    }
+
+    function clearCanvas() {
+      history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      loadImage();
+    }
+
+    function restoreCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (history.length > 0) {
+        ctx.putImageData(history[history.length - 1], 0, 0);
+      } else {
+        loadImage();
+      }
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+      isDrawing = true;
+      ctx.beginPath();
+      ctx.moveTo(e.offsetX, e.offsetY);
+      drawStrokes.push([]);
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (isDrawing) {
+        ctx.strokeStyle = colorPicker.value;
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.stroke();
+
+        drawStrokes[drawStrokes.length - 1].push({ x: e.offsetX, y: e.offsetY, color: colorPicker.value });
+        playSound('paint');
+      }
+    });
+
+    canvas.addEventListener('mouseup', () => {
+      isDrawing = false;
+      ctx.closePath();
+      history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+    });
+
+    function loadImage() {
+      const type = document.getElementById('imageSelector').value;
+      const img = new Image();
+
+      if (type === 'flower') img.src = 'https://i.imgur.com/7yUVEIx.png';
+      else if (type === 'house') img.src = 'https://i.imgur.com/dg2UQWw.png';
+      else img.src = 'https://i.imgur.com/2iR8cTO.png';
+
+      img.onload = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        history = [];
+        history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+      };
+    }
+
+    loadImage();
+  </script>
+</body>
+
+</html>
