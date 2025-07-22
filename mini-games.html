@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mini Games</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fff0f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      color: #c76c85;
+      margin-top: 30px;
+    }
+
+    .game-list {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .game-list a {
+      background-color: #f9d6e2;
+      color: #8a4f61;
+      padding: 15px 25px;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, background-color 0.3s ease;
+    }
+
+    .game-list a:hover {
+      background-color: #f7c3d2;
+      transform: translateY(-2px);
+    }
+
+    .back {
+      margin-top: auto;
+      margin-bottom: 20px;
+      text-decoration: none;
+      background-color: #f9d6e2;
+      color: #8a4f61;
+      padding: 10px 20px;
+      border-radius: 10px;
+    }
+
+    .back:hover {
+      background-color: #f7c3d2;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎮 Mini Games</h1>
+  <div class="game-list">
+    <a href="mood-pop.html">🎯 Mood Pop</a>
+    <a href="fruit-catcher.html">🍓 Fruit Catcher</a>
+    <a href="coloring-game.html">🎨 Coloring Game</a>
+    <a href="crossword.html"> Crossword Game</a>
+    <!-- Add more games as you make them -->
+  </div>
+  <a class="back" href="index.html">⬅ Back to Home</a>
+</body>
+</html>
