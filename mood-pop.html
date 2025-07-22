@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mood Pop Game</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fff0f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      color: #c76c85;
+      margin: 20px 0 10px;
+    }
+
+    #instruction {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      color: #8a4f61;
+    }
+
+    #gameArea {
+      position: relative;
+      width: 90vw;
+      max-width: 400px;
+      height: 500px;
+      background-color: #ffeef5;
+      border: 3px solid #f9d6e2;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .bubble {
+      position: absolute;
+      font-size: 2rem;
+      cursor: pointer;
+      animation: float 6s linear forwards;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100%);
+      }
+      100% {
+        transform: translateY(-120%);
+      }
+    }
+
+    #score {
+      font-size: 1.3rem;
+      margin: 10px;
+      color: #8a4f61;
+    }
+
+    .back {
+      margin-top: 10px;
+      text-decoration: none;
+      background-color: #f9d6e2;
+      color: #8a4f61;
+      padding: 10px 20px;
+      border-radius: 10px;
+    }
+
+    .back:hover {
+      background-color: #f7c3d2;
+    }
+  </style>
+</head>
+<body>
+  <h1>Mood Pop 🎈</h1>
+  <div id="instruction">Pop all: <span id="targetMood"></span></div>
+  <div id="score">Score: 0</div>
+  <div id="gameArea"></div>
+  <a class="back" href="index.html">⬅ Back to Planner</a>
+
+  <script>
+    const moods = ["😊", "😢", "😡", "😴", "😱"];
+    const gameArea = document.getElementById("gameArea");
+    const scoreDisplay = document.getElementById("score");
+    const targetMoodDisplay = document.getElementById("targetMood");
+    let score = 0;
+    let targetMood = "";
+
+    function setNewTarget() {
+      targetMood = moods[Math.floor(Math.random() * moods.length)];
+      targetMoodDisplay.textContent = targetMood;
+    }
+
+    function createBubble() {
+      const mood = moods[Math.floor(Math.random() * moods.length)];
+      const bubble = document.createElement("div");
+      bubble.classList.add("bubble");
+      bubble.textContent = mood;
+      bubble.style.left = Math.random() * (gameArea.offsetWidth - 40) + "px";
+      bubble.style.bottom = "0";
+      gameArea.appendChild(bubble);
+
+      bubble.addEventListener("click", () => {
+        if (bubble.textContent === targetMood) {
+          score++;
+          scoreDisplay.textContent = "Score: " + score;
+        } else {
+          score--;
+          scoreDisplay.textContent = "Score: " + score;
+        }
+        bubble.remove();
+      });
+
+      setTimeout(() => bubble.remove(), 6000);
+    }
+
+    // Start game
+    setNewTarget();
+    setInterval(createBubble, 1000);
+    setInterval(setNewTarget, 10000); // Change target every 10s
+  </script>
+</body>
+</html>
