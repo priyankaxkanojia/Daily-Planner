@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Self Love Journal</title>
+  <style>
+    body {
+      font-family: 'Georgia', serif;
+      background: #fffefc;
+      color: #444;
+      margin: 0;
+      padding: 40px;
+      max-width: 900px;
+      margin: auto;
+    }
+    h1 {
+      font-size: 36px;
+      margin-bottom: 5px;
+      color: #7b6e60;
+    }
+    .date-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .days {
+      letter-spacing: 10px;
+      font-weight: lighter;
+      font-size: 14px;
+      color: #888;
+    }
+    .section {
+      margin-top: 30px;
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 10px;
+    }
+    .line {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    .line textarea {
+      flex: 1;
+      border: none;
+      border-bottom: 1px solid #ccc;
+      background: transparent;
+      font-size: 14px;
+      resize: none;
+      padding: 5px;
+      outline: none;
+    }
+    .line .heart {
+      margin-right: 10px;
+      font-size: 16px;
+      color: #b08ba4;
+    }
+    .notes-box {
+      border: 1px solid #ccc;
+      min-height: 150px;
+      resize: none;
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    .two-columns {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .column {
+      flex: 1;
+      min-width: 300px;
+    }
+    .flower-corner {
+      position: relative;
+    }
+    .flower-corner::after {
+      content: "❀❀❀❀❀❀❀";
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      font-size: 16px;
+      color: #aaa;
+      transform: rotate(-30deg);
+    }
+    .date-input {
+      border: none;
+      border-bottom: 1px solid #aaa;
+      font-size: 16px;
+      padding: 4px;
+      outline: none;
+    }
+    select {
+      border: none;
+      border-bottom: 1px solid #aaa;
+      font-size: 16px;
+      padding: 4px;
+      outline: none;
+      background: #fffefc;
+      color: #444;
+    }
+    button {
+      padding: 10px 20px;
+      margin-top: 20px;
+      background-color: #f4e4eb;
+      border: 1px solid #b08ba4;
+      color: #b08ba4;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: Georgia, serif;
+    }
+    .dark-mode {
+      background: #1f1f1f;
+      color: #eaeaea;
+    }
+    .dark-mode select,
+    .dark-mode .notes-box,
+    .dark-mode textarea {
+      background-color: #333;
+      color: #f8f8f8;
+      border-color: #555;
+    }
+    .dark-mode .section-title,
+    .dark-mode h1,
+    .dark-mode .heart {
+      color: #ffccdd;
+    }
+    .dark-mode button,
+    .dark-mode a {
+      background-color: #333 !important;
+      color: #ffccdd !important;
+      border-color: #ffccdd !important;
+    }
+    .dark-mode input[type="radio"] {
+      accent-color: #ffccdd;
+    }
+  </style>
+</head>
+<body>
+  <button onclick="toggleTheme()" id="themeToggle" style="position: fixed; top: 20px; right: 20px; z-index: 999; background-color: #fff; border: 1px solid #ccc; border-radius: 6px; padding: 8px 12px; cursor: pointer;">
+    🌙/☀️ Mode
+  </button>
+
+  <div class="date-section">
+    <div>
+      <h1>self love<br>journal</h1>
+    </div>
+    <div>
+      <label>DATE:</label>
+      <select id="year"></select>
+      <select id="month"></select>
+      <select id="day"></select>
+      <div style="text-align: center; font-size: 14px; color: #888;">
+        <div style="display: flex; justify-content: center; gap: 12px;">
+          <div style="text-align: center;"><div>S</div><input type="checkbox"></div>
+          <div style="text-align: center;"><div>M</div><input type="checkbox"></div>
+          <div style="text-align: center;"><div>T</div><input type="checkbox"></div>
+          <div style="text-align: center;"><div>W</div><input type="checkbox"></div>
+          <div style="text-align: center;"><div>T</div><input type="checkbox"></div>
+          <div style="text-align: center;"><div>F</div><input type="checkbox"></div>
+          <div style="text-align: center;"><div>S</div><input type="checkbox"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✨ Mood Tracker Section -->
+  <div class="section" style="margin-top: 20px;">
+    <div class="section-title">Mood Tracker</div>
+    <div style="font-size: 24px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+      <label><input type="radio" name="mood" value="😊"> 😊</label>
+      <label><input type="radio" name="mood" value="😐"> 😐</label>
+      <label><input type="radio" name="mood" value="😢"> 😢</label>
+      <label><input type="radio" name="mood" value="😡"> 😡</label>
+      <label><input type="radio" name="mood" value="😴"> 😴</label>
+      <label><input type="radio" name="mood" value="🤩"> 🤩</label>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Today I'm Grateful For</div>
+    <div class="line"><span class="heart">♡</span><textarea></textarea></div>
+    <div class="line"><span class="heart">♡</span><textarea></textarea></div>
+  </div>
+
+  <div class="two-columns">
+    <div class="column">
+      <div class="section">
+        <div class="section-title">Today's Affirmation</div>
+        <div class="line"><span class="heart">♡</span><textarea></textarea></div>
+        <div class="line"><span class="heart">♡</span><textarea></textarea></div>
+        <div class="line"><span class="heart">♡</span><textarea></textarea></div>
+        <div class="line"><span class="heart">♡</span><textarea></textarea></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Notes / Reminders</div>
+        <textarea class="notes-box flower-corner"></textarea>
+      </div>
+    </div>
+
+    <div class="column">
+      <div class="section">
+        <div class="section-title">Something I'm Proud Of</div>
+        <div class="line"><span class="heart">♡</span><textarea></textarea></div>
+        <div class="line"><span class="heart">♡</span><textarea></textarea></div>
+        <div class="line"><span class="heart">♡</span><textarea></textarea></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Something I Love About Myself</div>
+        <div class="line"><span class="heart">♡</span><textarea></textarea></div>
+        <div class="line"><span class="heart">♡</span><textarea></textarea></div>
+        <div class="line"><span class="heart">♡</span><textarea></textarea></div>
+        <div class="line"><span class="heart">♡</span><textarea></textarea></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Tomorrow I Look Forward To</div>
+        <div class="line"><span class="heart">♡</span><textarea></textarea></div>
+        <div class="line"><span class="heart">♡</span><textarea></textarea></div>
+        <div class="line"><span class="heart">♡</span><textarea></textarea></div>
+        <div class="line"><span class="heart">♡</span><textarea></textarea></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align: center;">
+    <button onclick="saveJournal()">💾 Save</button>
+    <button onclick="loadJournal()">📖 Load</button>
+    <button onclick="deleteJournal()">🗑️ Delete</button>
+  </div>
+
+  <div style="margin-top: 40px; text-align: center;">
+    <a href="index.html" style="display: inline-block; text-decoration: none; padding: 10px 20px; border: 1px solid #b08ba4; border-radius: 8px; font-family: Georgia, serif; color: #b08ba4; background-color: #fdf8f8; transition: 0.3s ease;" onmouseover="this.style.backgroundColor='#f3e9ec'" onmouseout="this.style.backgroundColor='#fdf8f8'">
+      ← Back to Homepage
+    </a>
+  </div>
+
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle('dark-mode');
+    }
+
+    const yearSelect = document.getElementById('year');
+    const monthSelect = document.getElementById('month');
+    const daySelect = document.getElementById('day');
+
+    for (let y = 2025; y <= 2100; y++) {
+      const opt = document.createElement('option');
+      opt.value = opt.textContent = y;
+      yearSelect.appendChild(opt);
+    }
+
+    const months = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+    months.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = opt.textContent = m;
+      monthSelect.appendChild(opt);
+    });
+
+    function updateDays() {
+      daySelect.innerHTML = '';
+      const year = parseInt(yearSelect.value);
+      const month = parseInt(monthSelect.value) - 1;
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      for (let d = 1; d <= daysInMonth; d++) {
+        const opt = document.createElement('option');
+        opt.value = opt.textContent = d.toString().padStart(2, '0');
+        daySelect.appendChild(opt);
+      }
+    }
+
+    yearSelect.addEventListener('change', updateDays);
+    monthSelect.addEventListener('change', updateDays);
+
+    function saveJournal() {
+      const dateKey = `${yearSelect.value}-${monthSelect.value}-${daySelect.value}`;
+      const textareas = document.querySelectorAll('textarea');
+      const data = Array.from(textareas).map(t => t.value);
+      const selectedMood = document.querySelector('input[name="mood"]:checked');
+      const mood = selectedMood ? selectedMood.value : '';
+      localStorage.setItem(`journal-${dateKey}`, JSON.stringify({ entries: data, mood }));
+      alert("Journal saved for " + dateKey);
+    }
+
+    function loadJournal() {
+      const dateKey = `${yearSelect.value}-${monthSelect.value}-${daySelect.value}`;
+      const raw = localStorage.getItem(`journal-${dateKey}`);
+      if (!raw) return alert("No journal found for " + dateKey);
+      const data = JSON.parse(raw);
+      const textareas = document.querySelectorAll('textarea');
+      textareas.forEach((t, i) => {
+        t.value = data.entries[i] || '';
+      });
+      if (data.mood) {
+        const moodInput = document.querySelector(`input[name="mood"][value="${data.mood}"]`);
+        if (moodInput) moodInput.checked = true;
+      }
+      alert("Journal loaded for " + dateKey);
+    }
+
+    function deleteJournal() {
+      const dateKey = `${yearSelect.value}-${monthSelect.value}-${daySelect.value}`;
+      if (localStorage.getItem(`journal-${dateKey}`)) {
+        if (confirm("Are you sure you want to delete the journal for " + dateKey + "?")) {
+          localStorage.removeItem(`journal-${dateKey}`);
+          alert("Journal deleted for " + dateKey);
+          document.querySelectorAll('textarea').forEach(t => t.value = '');
+          document.querySelectorAll('input[name="mood"]').forEach(m => m.checked = false);
+        }
+      } else {
+        alert("No journal found for " + dateKey);
+      }
+    }
+
+    // Set default date
+    const today = new Date();
+    yearSelect.value = today.getFullYear();
+    monthSelect.value = (today.getMonth() + 1).toString().padStart(2, '0');
+    updateDays();
+    daySelect.value = today.getDate().toString().padStart(2, '0');
+  </script>
+</body>
+</html>
