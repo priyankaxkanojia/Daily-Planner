@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Avatar Dress-Up</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: sans-serif;
+      background-color: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    #main {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      width: 100%;
+      height: 100%;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    #categories, #saved-outfits {
+      width: 250px;
+      background: #fff;
+      padding: 10px;
+      overflow-y: auto;
+      border: 2px solid #ccc;
+    }
+
+    .category, .saved-outfit {
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #fefefe;
+    }
+
+    .category h4 {
+      margin-top: 0;
+    }
+
+    .category img, .saved-outfit img {
+      width: 80px;
+      cursor: pointer;
+      display: block;
+      margin: 5px auto;
+    }
+
+    .saved-outfit button {
+      margin: 5px 2px;
+      padding: 5px;
+      font-size: 12px;
+    }
+
+    #avatar-container {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      background-color: #fff;
+      border: 2px dashed #ccc;
+      height: 90%;
+      margin: 0 20px;
+    }
+
+    #avatar {
+      height: 100%;
+      object-fit: contain;
+      z-index: 0;
+    }
+
+    .clothing {
+      position: absolute;
+      cursor: grab;
+      resize: both;
+      overflow: auto;
+      max-width: 300px;
+      min-width: 50px;
+      min-height: 50px;
+      border: 1px dashed #999;
+      transform-origin: center center;
+      z-index: 10;
+    }
+
+    .controls, #avatar-select-container {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    button, select, input[type="file"] {
+      padding: 8px;
+      margin: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .back-tab {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: #e0cfe6;
+      color: #4a3f4d;
+      padding: 10px 15px;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      transition: background-color 0.3s ease;
+      z-index: 999;
+    }
+
+    .back-tab:hover {
+      background-color: #d4bde3;
+    }
+
+    .floating-tab {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #f9d6e2;
+      color: #8a4f61;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 24px;
+      text-align: center;
+      line-height: 40px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+    }
+
+    .bg-panel {
+      position: fixed;
+      bottom: 70px;
+      right: 20px;
+      background-color: #fff0f5;
+      padding: 10px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      display: none;
+      z-index: 1000;
+    }
+
+    .bg-panel input,
+    .bg-panel button {
+      margin-top: 5px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+
+<a href="index.html" class="back-tab">🔙 Back</a>
+<h2>Dress Up Your Avatar</h2>
+
+<div id="main">
+  <div id="categories">
+    <label for="category-select">Select Category:</label>
+    <select id="category-select">
+      <option value="tops">Tops</option>
+      <option value="shirts">Shirts</option>
+      <option value="skirts">Skirts</option>
+      <option value="dresses">Dresses</option>
+      <option value="shoes">Shoes</option>
+      <option value="jeans">Jeans</option>
+    </select>
+    <input type="file" id="upload" multiple accept="image/*">
+    <div class="category" id="tops"><h4>Tops</h4></div>
+    <div class="category" id="shirts"><h4>Shirts</h4></div>
+    <div class="category" id="skirts"><h4>Skirts</h4></div>
+    <div class="category" id="dresses"><h4>Dresses</h4></div>
+    <div class="category" id="shoes"><h4>Shoes</h4></div>
+    <div class="category" id="jeans"><h4>Jeans</h4></div>
+  </div>
+
+  <div style="flex-grow: 1;">
+    <div id="avatar-select-container">
+      <select id="avatar-select">
+        <option value="download (4)-Photoroom.png">Avatar 1</option>
+        <option value="avatar2.png">Avatar 2</option>
+      </select>
+    </div>
+    <div id="avatar-container">
+      <img id="avatar" src="download (4)-Photoroom.png" alt="Avatar">
+    </div>
+  </div>
+
+  <div id="saved-outfits">
+    <h4>Saved Outfits</h4>
+    <div id="outfit-gallery"></div>
+  </div>
+</div>
+
+<div class="controls">
+  <button onclick="saveOutfit()">Save Outfit</button>
+  <button onclick="clearClothes()">Delete Outfit</button>
+</div>
+
+<!-- Floating background editing tab -->
+<div class="floating-tab" onclick="toggleBgPanel()">🎨</div>
+
+<div class="bg-panel" id="bgPanel">
+  <input type="file" id="bgInput" accept="image/*">
+  <button onclick="setBackground()">Set Background</button>
+  <button onclick="clearBackground()">Reset</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+  const container = document.getElementById('avatar-container');
+  const upload = document.getElementById('upload');
+  const categorySelect = document.getElementById('category-select');
+  const outfitGallery = document.getElementById('outfit-gallery');
+
+  upload.addEventListener('change', function () {
+    const files = [...upload.files];
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        addClothingToCategory(e.target.result, categorySelect.value);
+        saveImageToStorage(e.target.result, categorySelect.value);
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+
+  function saveImageToStorage(base64, category) {
+    const saved = JSON.parse(localStorage.getItem("uploadedClothes") || "[]");
+    saved.push({ base64, category });
+    localStorage.setItem("uploadedClothes", JSON.stringify(saved));
+  }
+
+  function loadImagesFromStorage() {
+    const saved = JSON.parse(localStorage.getItem("uploadedClothes") || "[]");
+    saved.forEach(item => addClothingToCategory(item.base64, item.category));
+  }
+
+  function addClothingToCategory(src, category) {
+    const categoryDiv = document.getElementById(category);
+    const wrapper = document.createElement('div');
+    wrapper.style.position = 'relative';
+    wrapper.style.display = 'inline-block';
+    wrapper.style.margin = '5px';
+
+    const img = document.createElement('img');
+    img.src = src;
+    img.addEventListener('click', () => addToAvatar(img.src));
+
+    const deleteBtn = document.createElement('span');
+    deleteBtn.innerHTML = '❌';
+    deleteBtn.style.position = 'absolute';
+    deleteBtn.style.top = '0px';
+    deleteBtn.style.right = '0px';
+    deleteBtn.style.cursor = 'pointer';
+    deleteBtn.style.background = 'white';
+    deleteBtn.style.borderRadius = '50%';
+    deleteBtn.style.fontSize = '12px';
+    deleteBtn.style.padding = '2px';
+
+    deleteBtn.addEventListener('click', () => {
+      wrapper.remove();
+      const saved = JSON.parse(localStorage.getItem("uploadedClothes") || "[]");
+      const updated = saved.filter(i => i.base64 !== src);
+      localStorage.setItem("uploadedClothes", JSON.stringify(updated));
+    });
+
+    wrapper.appendChild(img);
+    wrapper.appendChild(deleteBtn);
+    categoryDiv.appendChild(wrapper);
+  }
+
+  function addToAvatar(src) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'clothing';
+    wrapper.style.top = '0px';
+    wrapper.style.left = '0px';
+    wrapper.style.width = '120px';
+
+    const img = document.createElement('img');
+    img.src = src;
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.pointerEvents = 'none';
+
+    wrapper.appendChild(img);
+    container.appendChild(wrapper);
+
+    makeDraggableResizableRotatable(wrapper);
+
+    wrapper.addEventListener('dblclick', () => wrapper.remove());
+  }
+
+  function makeDraggableResizableRotatable(el) {
+    let offsetX, offsetY, isDragging = false;
+
+    el.addEventListener('mousedown', (e) => {
+      if (e.altKey) {
+        let rotation = parseInt(el.getAttribute('data-rotation') || 0);
+        rotation = (rotation + 15) % 360;
+        el.style.transform = `rotate(${rotation}deg)`;
+        el.setAttribute('data-rotation', rotation);
+        return;
+      }
+      isDragging = true;
+      offsetX = e.offsetX;
+      offsetY = e.offsetY;
+      el.style.zIndex = 1000;
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        const rect = container.getBoundingClientRect();
+        el.style.left = `${e.clientX - rect.left - offsetX}px`;
+        el.style.top = `${e.clientY - rect.top - offsetY}px`;
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      isDragging = false;
+      el.style.zIndex = '';
+    });
+  }
+
+  function saveOutfit() {
+    html2canvas(container).then(canvas => {
+      const imgData = canvas.toDataURL("image/png");
+      const savedOutfits = JSON.parse(localStorage.getItem("savedOutfits") || "[]");
+      savedOutfits.push(imgData);
+      localStorage.setItem("savedOutfits", JSON.stringify(savedOutfits));
+      displaySavedOutfits();
+    });
+  }
+
+  function clearClothes() {
+    document.querySelectorAll('.clothing').forEach(c => c.remove());
+  }
+
+  function displaySavedOutfits() {
+    outfitGallery.innerHTML = "";
+    const saved = JSON.parse(localStorage.getItem("savedOutfits") || "[]");
+    saved.forEach((src, index) => {
+      const div = document.createElement('div');
+      div.className = 'saved-outfit';
+
+      const img = document.createElement('img');
+      img.src = src;
+
+      const viewBtn = document.createElement('button');
+      viewBtn.innerText = 'View';
+      viewBtn.onclick = () => window.open(src);
+
+      const delBtn = document.createElement('button');
+      delBtn.innerText = 'Delete';
+      delBtn.onclick = () => {
+        const updated = saved.filter((_, i) => i !== index);
+        localStorage.setItem("savedOutfits", JSON.stringify(updated));
+        displaySavedOutfits();
+      };
+
+      div.appendChild(img);
+      div.appendChild(viewBtn);
+      div.appendChild(delBtn);
+      outfitGallery.appendChild(div);
+    });
+  }
+
+  document.getElementById('avatar-select').addEventListener('change', function () {
+    document.getElementById('avatar').src = this.value;
+  });
+
+  // Background logic
+  function toggleBgPanel() {
+    const panel = document.getElementById('bgPanel');
+    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+  }
+
+  function setBackground() {
+    const bgInput = document.getElementById('bgInput');
+    if (!bgInput.files.length) return alert("Please select an image.");
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      document.body.style.backgroundImage = `url(${e.target.result})`;
+      localStorage.setItem('avatarBg', e.target.result);
+    };
+    reader.readAsDataURL(bgInput.files[0]);
+  }
+
+  function clearBackground() {
+    document.body.style.backgroundImage = '';
+    localStorage.removeItem('avatarBg');
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    loadImagesFromStorage();
+    displaySavedOutfits();
+    const bg = localStorage.getItem('avatarBg');
+    if (bg) document.body.style.backgroundImage = `url(${bg})`;
+  });
+</script>
+
+</body>
+</html>
