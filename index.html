@@ -9,7 +9,6 @@
   <style>
     body {
       background-color: #ffeef5;
-      /* Default background removed */
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -61,7 +60,6 @@
       color: #b98e9b;
     }
 
-    /* 🎨 Background Panel Styles */
     .floating-tab {
       position: fixed;
       bottom: 20px;
@@ -97,16 +95,67 @@
       width: 100%;
       box-sizing: border-box;
     }
+
+    /* 🌙 Dark Mode Styles */
+    body.dark-mode {
+      background-color: #1f1f1f;
+      color: #eaeaea;
+    }
+
+    .dark-mode h1 {
+      color: #ffccdd;
+    }
+
+    .dark-mode .nav-buttons a {
+      background-color: #333 !important;
+      color: #ffccdd !important;
+      border: 1px solid #ffccdd !important;
+    }
+
+    .dark-mode .floating-tab,
+    .dark-mode .bg-panel,
+    .dark-mode button {
+      background-color: #333 !important;
+      color: #ffccdd !important;
+      border-color: #ffccdd !important;
+    }
+
+    .dark-mode footer {
+      color: #aaa;
+    }
+
+    /* 🌞 Theme Toggle Button */
+    #themeToggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 999;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    .dark-mode #themeToggle {
+      background-color: #333;
+      color: #ffccdd;
+      border-color: #ffccdd;
+    }
   </style>
 </head>
 
 <body>
+  <button onclick="toggleTheme()" id="themeToggle">🌙/☀️ Mode</button>
+
   <h1>Your Daily Planner</h1>
   <div class="nav-buttons">
     <a href="planner.html">📝 Daily Goal Planner</a>
     <a href="image-gallery.html">📸 Image Gallery</a>
     <a href="journal.html">📖 Journal</a>
     <a href="mood-tracker.html">🌈 Mood Tracker</a>
+    <a href="create-outfit.html">👗👕 Outfit Generator</a>
+    <a href="mini-games.html">🎮 Play Mini Games</a>
   </div>
 
   <footer>
@@ -131,7 +180,6 @@
     function setBackground() {
       const bgInput = document.getElementById('bgInput');
       if (!bgInput.files.length) return alert("Please select a background image.");
-
       const reader = new FileReader();
       reader.onload = function (e) {
         localStorage.setItem('backgroundImage', e.target.result);
@@ -143,6 +191,10 @@
     function clearBackground() {
       localStorage.removeItem('backgroundImage');
       document.body.style.backgroundImage = '';
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('dark-mode');
     }
 
     window.onload = function () {
